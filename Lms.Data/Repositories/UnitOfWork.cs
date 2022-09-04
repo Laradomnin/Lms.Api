@@ -13,5 +13,16 @@ namespace Lms.Data.Repositories
         private readonly LmsApiContext db;
         public ICourseRepository CourseRepository { get; }
         public IModuleRepository ModuleRepository { get; }
+        public UnitOfWork(LmsApiContext db)
+        {
+            this.db = db;
+            CourseRepository = new CourseRepository(db);
+            ModuleRepository = new ModuleRepository(db);
+        }
+        public async Task CompleteAsync()
+        {
+            await db.SaveChangesAsync();
+        }
     }
+    
 }
