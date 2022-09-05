@@ -28,8 +28,8 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db= scope.ServiceProvider.GetRequiredService<LmsApiContext>();
-    db.Database.EnsureDeleted();
-    db.Database.Migrate();
+    //db.Database.EnsureDeleted();
+    //db.Database.Migrate();
     try
     {
         await SeedData.InitAsync(db);

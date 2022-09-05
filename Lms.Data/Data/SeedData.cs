@@ -18,36 +18,60 @@ namespace Lms.Data.Data
         {
             if (await db.Course.AnyAsync()) return;
             faker = new Faker("sv");
-            //var modules = GenerateModules(10);
-            //await db.Module.AddRangeAsync(modules);
 
             var courses = GenerateCourses(10);
             await db.Course.AddRangeAsync(courses);
 
+            //var modules = GenerateModules(5, courses);
+            //await db.Module.AddRangeAsync(modules);
+
             await db.SaveChangesAsync();
         }
-        //private static IEnumerable<Module> GenerateModules(int numberOfModules)
+
+        private static IEnumerable<Course> GenerateCourses(int numberOfCourses)
+        {
+            var courses = new List<Course>();
+
+            for (int i = 0; i < numberOfCourses; i++)
+            {
+
+                var modules = new List<Module>();
+
+                for (int x = 0; x < 5; x++)
+                {
+                    var ttitle = faker.Company.CatchPhrase();
+                    var sstartDate = DateTime.Now.AddDays(faker.Random.Int(-5, 5));
+                    var module = new Module(ttitle, sstartDate);
+                    modules.Add(module);
+                }
+
+                var title = faker.Company.CatchPhrase();
+                DateTime startDate = DateTime.Now.AddDays(faker.Random.Int(-5, 5));
+                var course = new Course(title, startDate)
+                {
+                    Modules = modules
+                };
+
+
+
+
+                courses.Add(course);
+            }
+            return courses;
+        }
+        //private static IEnumerable<Module> GenerateModules(int numberOfModules, IEnumerable<Course> courses)
         //{
         //    var modules = new List<Module>();
         //    for (int i = 0; i < numberOfModules; i++)
         //    {
         //        var title = faker.Company.CatchPhrase();
         //        DateTime startDate = DateTime.Now.AddDays(faker.Random.Int(-5, 5));
-        //        modules.Add(new Module(title, startDate));
+        //        modules.Add(new Module(title, startDate)
+        //        {
+        //            CourseId = courses.First().Id
+        //        });
         //    }
         //    return modules;
         //}
-        private static IEnumerable<Course> GenerateCourses(int numberOfCourses)
-        {
-            var courses = new List<Course>();
-            for (int i = 0; i < numberOfCourses; i++)
-            {
-                var title = faker.Company.CatchPhrase();
-                DateTime startDate = DateTime.Now.AddDays(faker.Random.Int(-5, 5));
-
-                courses.Add(new Course(title, startDate));
-            }
-            return courses;
-        }
     }
 }
