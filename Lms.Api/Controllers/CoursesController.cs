@@ -12,7 +12,7 @@ using AutoMapper;
 
 namespace Lms.Api.Controllers
 {
-    [Route("api/[controller]")] //? [Route("api/events")]?
+    [Route("api/courses")] 
     [ApiController]
     public class CoursesController : ControllerBase
     {
@@ -22,21 +22,19 @@ namespace Lms.Api.Controllers
         public CoursesController(LmsApiContext context,IMapper mapper)
         {
             _context = context;
-             uow = new UnitOfWork(_context);
+            this.mapper = mapper;
+            uow = new UnitOfWork(_context);
         }
 
-        // GET: api/Courses
+        //GET: api/Courses
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Course>>> GetCourse()
+        public async Task<ActionResult<IEnumerable<Course>>> GetAllCourses()
         {
-          if (_context.Course == null)
-          {
-              return NotFound();
-          }
-            return await _context.Course.ToListAsync();
+         var courses = await uow.CourseRepository.GetAllCourses();
+            return Ok(courses);
         }
 
-        // GET: api/Courses/5
+       
         [HttpGet("{id}")]
         public async Task<ActionResult<Course>> GetCourse(int id)
         {
@@ -44,7 +42,7 @@ namespace Lms.Api.Controllers
           {
               return NotFound();
           }
-            var course = await _context.Course.FindAsync(id);
+            var course = await uow.CourseRepository.FindAsync(id);
 
             if (course == null)
             {
@@ -54,8 +52,6 @@ namespace Lms.Api.Controllers
             return course;
         }
 
-        // PUT: api/Courses/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCourse(int id, Course course)
         {
