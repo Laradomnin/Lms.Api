@@ -7,18 +7,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Lms.Data.Data;
 using Lms.Core.Entities;
+using Lms.Data.Repositories;
+using AutoMapper;
 
 namespace Lms.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]")] //? [Route("api/events")]?
     [ApiController]
     public class CoursesController : ControllerBase
     {
         private readonly LmsApiContext _context;
-
-        public CoursesController(LmsApiContext context)
+        private readonly IMapper mapper;
+        private readonly UnitOfWork uow;
+        public CoursesController(LmsApiContext context,IMapper mapper)
         {
             _context = context;
+             uow = new UnitOfWork(_context);
         }
 
         // GET: api/Courses

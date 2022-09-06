@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Lms.Data.Data;
 using Lms.Core.Entities;
+using AutoMapper;
+using Lms.Data.Repositories;
+using Lms.Core.Dto;
 
 namespace Lms.Api.Controllers
 {
@@ -15,11 +18,16 @@ namespace Lms.Api.Controllers
     public class ModulesController : ControllerBase
     {
         private readonly LmsApiContext _context;
+        private readonly IMapper mapper;
+        private readonly UnitOfWork uow;
 
-        public ModulesController(LmsApiContext context)
+        public ModulesController(LmsApiContext context,IMapper mapper)
         {
             _context = context;
-        }
+            this.mapper = mapper;
+            uow = new UnitOfWork(_context);
+        }  
+
 
         // GET: api/Modules
         [HttpGet]
@@ -32,69 +40,38 @@ namespace Lms.Api.Controllers
             return await _context.Module.ToListAsync();
         }
 
-        // GET: api/Modules/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Module>> GetModule(int id)
+        //[Route("{id}")]
+        public async Task<ActionResult<ModuleDto>> GetModule(int id)
         {
-          if (_context.Module == null)
-          {
-              return NotFound();
-          }
-            var @module = await _context.Module.FindAsync(id);
+            if ((await uow.ModuleRepository.GetModule(id)) is null)
+                return NotFound(new { Error = new[] { $"CodeEvent with Id: [{id}] not found" } });
 
-            if (@module == null)
-            {
-                return NotFound();
-            }
+            var module = await uow.ModuleRepository.GetModule(id);
 
-            return @module;
+            if (module is null) return BadRequest();
+
+            return Ok(mapper.Map<ModuleDto>(module));
         }
 
-        // PUT: api/Modules/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutModule(int id, Module @module)
-        {
-            if (id != @module.Id)
-            {
-                return BadRequest();
-            }
 
-            _context.Entry(@module).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ModuleExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Modules
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Module>> PostModule(Module @module)
+        public async Task<ActionResult<ModuleDto>> Create(int id, ModuleDto dto)
         {
-          if (_context.Module == null)
-          {
-              return Problem("Entity set 'LmsApiContext.Module'  is null.");
-          }
-            _context.Module.Add(@module);
-            await _context.SaveChangesAsync();
+            var course = await uow.CourseRepository.GetCourse(id);
+            if (course is null)
+                return NotFound(new { Error = new[] { $"CodeEvent with id: [{id}] not found" } });
 
-            return CreatedAtAction("GetModule", new { id = @module.Id }, @module);
+            var module = mapper.Map<Module>(dto);
+            module.Course = course;
+            await uow.ModuleRepository.Add(module);
+
+            await uow.CompleteAsync();
+            var model = mapper.Map<ModuleDto>(module);
+            return CreatedAtAction(nameof(GetCourse), new { name = course.Title, id = model.Id }, model);
+
         }
+
 
         // DELETE: api/Modules/5
         [HttpDelete("{id}")]
@@ -120,5 +97,39 @@ namespace Lms.Api.Controllers
         {
             return (_context.Module?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+
+
+        // PUT: api/Modules/5
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutModule(int id, Module @module)
+        //{
+        //    if (id != @module.Id)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    _context.Entry(@module).State = EntityState.Modified;
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!ModuleExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
     }
+
 }

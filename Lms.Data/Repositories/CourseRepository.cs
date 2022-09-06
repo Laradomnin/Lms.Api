@@ -20,12 +20,16 @@ namespace Lms.Data.Repositories
 
         public async Task<IEnumerable<Course>> GetAllCourses()
         {
-            return await db.Course.ToListAsync();
+           return await db.Course.ToListAsync();
         }
 
-        public void Add(Course course)
+        public async Task AddAsync(Course course)
         {
-            db.Add(course);
+            if (course == null) 
+            { 
+                throw new ArgumentNullException(nameof(course));
+            }         
+                await db.AddAsync (course);
         }
 
         public Task<bool> AnyAsync(int? id)
