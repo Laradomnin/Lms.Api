@@ -9,6 +9,7 @@ using Lms.Data.Data;
 using Lms.Core.Entities;
 using Lms.Data.Repositories;
 using AutoMapper;
+using Lms.Core.Dto;
 
 namespace Lms.Api.Controllers
 {
@@ -81,10 +82,24 @@ namespace Lms.Api.Controllers
             return NoContent();
         }
 
-        // POST: api/Courses
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{title}")]
+        public async Task<ActionResult<CourseDto>> PutDto(string title, CourseDto dto)
+        {
+            var course = await uow.CourseRepository.GetCourse(title);
+            if (course == null)
+                return NotFound();
+            mapper.Map(dto,course);
+            await uow.CompleteAsync();
+            return Ok(mapper.Map<CourseDto>(course));
+
+        }
+
+
+
+
+
         [HttpPost]
-        public async Task<ActionResult<Course>> PostCourse(Course course)
+        public async Task<ActionResult<Course>> AddAcync(Course course)
         {
           if (_context.Course == null)
           {
@@ -96,6 +111,15 @@ namespace Lms.Api.Controllers
             return CreatedAtAction("GetCourse", new { id = course.Id }, course);
         }
 
+        [HttpPost]//med dto
+        public async Task<ActionResult<CourseDto>> Create(CourseDto dto)
+        {
+            var course = mapper.Map<Course>(dto);
+            await uow.CourseRepository.AddAsync(course);
+            uow.CourseRepository.Update(course);
+            //return CreatedAtAction("AddAsync", new { id = course.Id }, course);
+            return Ok(mapper.Map<CourseDto>(course));
+        }
         // DELETE: api/Courses/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCourse(int id)

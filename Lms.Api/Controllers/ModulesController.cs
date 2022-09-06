@@ -100,36 +100,7 @@ namespace Lms.Api.Controllers
 
 
 
-        // PUT: api/Modules/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutModule(int id, Module @module)
-        //{
-        //    if (id != @module.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.Entry(@module).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!ModuleExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
+        // PUT:
     }
 
 }

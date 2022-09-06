@@ -37,10 +37,12 @@ namespace Lms.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<Course?> GetCourse(int? id)
+        public async Task<Course?> GetCourse(string? title)
         {
-            return await db.Course.FirstOrDefaultAsync(c => c.Id == id);
-        }   
+            return await db.Course.FirstOrDefaultAsync(c => c.Title == title);
+        }
+
+    
 
         public Task<Course> FindAsync(int? id)
         {
