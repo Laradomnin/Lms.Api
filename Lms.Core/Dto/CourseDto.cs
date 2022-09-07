@@ -9,7 +9,7 @@ namespace Lms.Core.Dto
     #nullable disable
     public class CourseDto
     {
-        public int Id { get; set; }
+      //  public int Id { get; set; }
         public string Title { get; set; }
         public DateTime StartDate { get; set; }
 

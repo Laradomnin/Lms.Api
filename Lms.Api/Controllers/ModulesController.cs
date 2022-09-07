@@ -10,6 +10,7 @@ using Lms.Core.Entities;
 using AutoMapper;
 using Lms.Data.Repositories;
 using Lms.Core.Dto;
+using Lms.Core.Repositories;
 
 namespace Lms.Api.Controllers
 {
@@ -19,26 +20,34 @@ namespace Lms.Api.Controllers
     {
         private readonly LmsApiContext _context;
         private readonly IMapper mapper;
-        private readonly UnitOfWork uow;
+        private readonly IUnitOfWork uow;
 
-        public ModulesController(LmsApiContext context,IMapper mapper)
+        public ModulesController(LmsApiContext context,IMapper mapper, IUnitOfWork unitOfWork)
         {
             _context = context;
             this.mapper = mapper;
-            uow = new UnitOfWork(_context);
-        }  
-
-
-        // GET: api/Modules
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Module>>> GetModule()
-        {
-          if (_context.Module == null)
-          {
-              return NotFound();
-          }
-            return await _context.Module.ToListAsync();
+            uow = unitOfWork;  
         }
+
+        [HttpGet] //GET: api/Modules dto 
+        public async Task<ActionResult<IEnumerable<Course>>> GetAllModules()
+        {
+            var modules = await uow.ModuleRepository.GetAllModules();
+            var dto = mapper.Map<IEnumerable<ModuleDto>>(modules);
+            return Ok(dto);
+        }
+
+
+        //// GET: api/Modules
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<Module>>> GetModule()
+        //{
+        //  if (_context.Module == null)
+        //  {
+        //      return NotFound();
+        //  }
+        //    return await _context.Module.ToListAsync();
+        //}
 
         [HttpGet("{id}")]
         //[Route("{id}")]
@@ -58,9 +67,9 @@ namespace Lms.Api.Controllers
         //[HttpPost]
         //public async Task<ActionResult<ModuleDto>> Create(int id, ModuleDto dto)
         //{
-        //    var course = await uow.CourseRepository.GetCourse(id);
+        //    var module = await uow.ModuleRepository.GetModule(id);
         //    if (course is null)
-        //        return NotFound(new { Error = new[] { $"CodeEvent with id: [{id}] not found" } });
+        //        return NotFound(new { Error = new[] { with id: [{id}] not found" } });
 
         //    var module = mapper.Map<Module>(dto);
         //    module.Course = course;

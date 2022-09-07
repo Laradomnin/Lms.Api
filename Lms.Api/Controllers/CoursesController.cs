@@ -69,7 +69,7 @@ namespace Lms.Api.Controllers
             await uow.CourseRepository.AddAsync(course);
             await uow.CompleteAsync();
 
-            return CreatedAtAction(nameof(GetCourse), new { title = course.Title }, dto);
+            return CreatedAtAction(nameof(GetCourse), new { id = course.Id }, dto);
 
         }
 

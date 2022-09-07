@@ -1,9 +1,10 @@
-﻿using Lms.Core.Repositories;
+﻿using Lms.Core.Entities;
+using Lms.Core.Repositories;
 using Lms.Data.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,9 +18,9 @@ namespace Lms.Data.Repositories
         {
             this.db = db;
         }
-        public Task<IEnumerable<Module>> GetAllModules()
+        public async Task<IEnumerable<Module>> GetAllModules()
         {
-            throw new NotImplementedException();
+            return await db.Module.ToListAsync();
         }
 
         public Task<Module> GetModule(int? id)
