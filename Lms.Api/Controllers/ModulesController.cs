@@ -38,17 +38,6 @@ namespace Lms.Api.Controllers
         }
 
 
-        //// GET: api/Modules
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<Module>>> GetModule()
-        //{
-        //  if (_context.Module == null)
-        //  {
-        //      return NotFound();
-        //  }
-        //    return await _context.Module.ToListAsync();
-        //}
-
         [HttpGet("{id}")]
         //[Route("{id}")]
         public async Task<ActionResult<ModuleDto>> GetModule(int id)
@@ -62,25 +51,24 @@ namespace Lms.Api.Controllers
 
             return Ok(mapper.Map<ModuleDto>(module));
         }
+        [HttpPost]
+        public async Task<ActionResult<ModuleDto>> Create(string title, ModuleDto dto)
+        {
+            var course = await uow.CourseRepository.GetCourse(title);
+            if (course is null)
+                return NotFound(new { Error = new[] { $"Course with title: [{title}] not found" } });
 
+            var module = mapper.Map<Module>(dto);
+            module.Course = course;
+            await uow.ModuleRepository.Add(module);
 
-        //[HttpPost]
-        //public async Task<ActionResult<ModuleDto>> Create(int id, ModuleDto dto)
-        //{
-        //    var module = await uow.ModuleRepository.GetModule(id);
-        //    if (course is null)
-        //        return NotFound(new { Error = new[] { with id: [{id}] not found" } });
+            await uow.CompleteAsync();
+            var vy = mapper.Map<ModuleDto>(module);
+            return CreatedAtAction(nameof(GetModule), new { title = course.Title, id = vy.Id }, vy);
 
-        //    var module = mapper.Map<Module>(dto);
-        //    module.Course = course;
-        //    await uow.ModuleRepository.Add(module);
+        }
 
-        //    await uow.CompleteAsync();
-        //    var model = mapper.Map<ModuleDto>(module);
-        //    return CreatedAtAction(nameof(GetCourse), new { name = course.Title, id = model.Id }, model);
-
-        //}
-
+        
 
         // DELETE: api/Modules/5
         [HttpDelete("{id}")]

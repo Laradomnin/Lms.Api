@@ -27,6 +27,25 @@ namespace Lms.Data.Repositories
         {
             throw new NotImplementedException();
         }
+
+         public async Task Add (Module module)
+        {
+            if (module is null)
+            {
+                throw new ArgumentNullException(nameof(module));
+            }
+
+            await db.AddAsync(module);
+        }
+
+        public  void Update (Module module)
+        {
+            throw new NotImplementedException();
+        }
+        public void Remove (Module module)
+        {
+            throw new NotImplementedException();
+        }
       
         public Task<Module> FindAsync(int? id)
         {
@@ -38,18 +57,7 @@ namespace Lms.Data.Repositories
         {
             throw new NotImplementedException();
         }
-        public void Add(Module module)
-        {
-            throw new NotImplementedException();
-        }
-        public  void Update (Module module)
-        {
-            throw new NotImplementedException();
-        }
-        public void Remove (Module module)
-        {
-            throw new NotImplementedException();
-        }
+       
 
        
     }

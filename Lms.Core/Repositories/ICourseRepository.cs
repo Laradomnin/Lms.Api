@@ -11,7 +11,7 @@ namespace Lms.Core.Repositories
     {
         Task<IEnumerable<Course>> GetAllCourses();
 
-        //Task<Course> GetCourse(int id);
+        Task<Course> GetCourse(int id);
         Task<Course> FindAsync(int id);
         Task<bool> AnyAsync(int? id);
         Task AddAsync(Course course);

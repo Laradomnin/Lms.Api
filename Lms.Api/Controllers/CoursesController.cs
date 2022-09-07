@@ -11,6 +11,7 @@ using Lms.Data.Repositories;
 using AutoMapper;
 using Lms.Core.Dto;
 using Lms.Core.Repositories;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Lms.Api.Controllers
 {
@@ -103,48 +104,59 @@ namespace Lms.Api.Controllers
 
             return NoContent();
         }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCourse(int id, Course course)
+        [HttpPatch("{Id}")]
+        public async Task<ActionResult<CourseDto>> PatchEvent(int id, JsonPatchDocument <CourseDto> patchDocument)
         {
-            if (id != course.Id)
-            {
-                return BadRequest();
-            }
+            var course = await uow.CourseRepository.FindAsync(id);   //GetCourse??
 
-            _context.Entry(course).State = EntityState.Modified;
+            if (course is null) return NotFound();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CourseExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            var dto = mapper.Map<CourseDto>(course);
 
-            return NoContent();
+            patchDocument.ApplyTo(dto, ModelState);
+
+            if (!TryValidateModel(dto)) return BadRequest(ModelState);
+
+            mapper.Map(dto, course);
+
+            await uow.CompleteAsync();
+
+            return Ok(mapper.Map<CourseDto>(course));
         }
 
-       
-
-     
-
-
-       
-        
-
-        private bool CourseExists(int id)
+         private bool CourseExists(int id)
         {
             return (_context.Course?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutCourse(int id, Course course)
+        //{
+        //    if (id != course.Id)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    _context.Entry(course).State = EntityState.Modified;
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!CourseExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
 
 
         //[HttpPost]

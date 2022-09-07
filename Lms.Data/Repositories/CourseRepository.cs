@@ -42,13 +42,13 @@ namespace Lms.Data.Repositories
         public async Task<Course?> GetCourse(string? title)
         {
             return await db.Course.FirstOrDefaultAsync(c => c.Title == title);
+            
         }
-        public async Task<Course?> GetCourse(int? id)
+        public async Task<Course?> GetCourse(int id)
         {
+
             return await db.Course.FirstOrDefaultAsync(c => c.Id == id);
         }
-
-
 
         public async Task<Course?> FindAsync(int id)
         {

@@ -13,7 +13,7 @@ namespace Lms.Core.Repositories
         Task<Module> GetModule(int? id);
         Task<Module> FindAsync(int? id);
         Task<bool> AnyAsync(int? id);
-        void Add(Module module);
+        Task Add(Module module);
         void Update(Module module);
         void Remove(Module module);
 
