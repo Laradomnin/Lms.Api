@@ -10,6 +10,7 @@ using Lms.Core.Entities;
 using Lms.Data.Repositories;
 using AutoMapper;
 using Lms.Core.Dto;
+using Lms.Core.Repositories;
 
 namespace Lms.Api.Controllers
 {
@@ -19,24 +20,26 @@ namespace Lms.Api.Controllers
     {
         private readonly LmsApiContext _context;
         private readonly IMapper mapper;
-        private readonly UnitOfWork uow;
-        public CoursesController(LmsApiContext context,IMapper mapper)
+        private readonly IUnitOfWork uow;
+        public CoursesController(LmsApiContext context,IMapper mapper, IUnitOfWork unitOfWork )
         {
             _context = context;
             this.mapper = mapper;
-            uow = new UnitOfWork(_context);
+            //  uow = new UnitOfWork(_context);
+            uow = unitOfWork;
         }
+ 
 
-        //GET: api/Courses
-        [HttpGet]
+        [HttpGet] //GET: api/Courses dto 
         public async Task<ActionResult<IEnumerable<Course>>> GetAllCourses()
         {
-         var courses = await uow.CourseRepository.GetAllCourses();
-            return Ok(courses);
+            var courses = await uow.CourseRepository.GetAllCourses();
+            var dto = mapper.Map<IEnumerable<CourseDto>>(courses);
+            return Ok(dto);
         }
 
-       
-        [HttpGet("{id}")]
+
+        [HttpGet("{id}")] // dto
         public async Task<ActionResult<Course>> GetCourse(int id)
         {
           if (_context.Course == null)
@@ -45,12 +48,60 @@ namespace Lms.Api.Controllers
           }
             var course = await uow.CourseRepository.FindAsync(id);
 
+            if (course is null)
+            {
+                return NotFound();
+            }
+            var dto = mapper.Map<CourseDto>(course);    
+
+            return Ok(dto);
+        }
+
+        [HttpPost]// Create med dto
+        public async Task<ActionResult<CourseDto>> Create(CourseDto dto)
+        {
+            if (await uow.CourseRepository.GetCourse(dto.Title) != null)
+            {
+                ModelState.AddModelError("Title", "Title is in use");
+                return BadRequest();
+            }
+            var course = mapper.Map<Course>(dto);
+            await uow.CourseRepository.AddAsync(course);
+            await uow.CompleteAsync();
+
+            return CreatedAtAction(nameof(GetCourse), new { title = course.Title }, dto);
+
+        }
+
+        [HttpPut("{title}")] //update allt i en course, dto
+        public async Task<ActionResult<CourseDto>> PutDto(string title, CourseDto dto)
+        {
+            var course = await uow.CourseRepository.GetCourse(title);
+            if (course == null)
+                return NotFound();
+            mapper.Map(dto, course);
+            await uow.CompleteAsync();
+            return Ok(mapper.Map<CourseDto>(course));
+
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCourse(int id)
+        {
+            if (_context.Course == null)
+            {
+                return NotFound();
+            }
+            var course = await _context.Course.FindAsync(id);
             if (course == null)
             {
                 return NotFound();
             }
 
-            return course;
+            _context.Course.Remove(course);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         [HttpPut("{id}")]
@@ -82,67 +133,39 @@ namespace Lms.Api.Controllers
             return NoContent();
         }
 
-        [HttpPut("{title}")]
-        public async Task<ActionResult<CourseDto>> PutDto(string title, CourseDto dto)
-        {
-            var course = await uow.CourseRepository.GetCourse(title);
-            if (course == null)
-                return NotFound();
-            mapper.Map(dto,course);
-            await uow.CompleteAsync();
-            return Ok(mapper.Map<CourseDto>(course));
+       
 
-        }
+     
 
 
-
-
-
-        [HttpPost]
-        public async Task<ActionResult<Course>> AddAcync(Course course)
-        {
-          if (_context.Course == null)
-          {
-              return Problem("Entity set 'LmsApiContext.Course'  is null.");
-          }
-            _context.Course.Add(course);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCourse", new { id = course.Id }, course);
-        }
-
-        [HttpPost]//med dto
-        public async Task<ActionResult<CourseDto>> Create(CourseDto dto)
-        {
-            var course = mapper.Map<Course>(dto);
-            await uow.CourseRepository.AddAsync(course);
-            uow.CourseRepository.Update(course);
-            //return CreatedAtAction("AddAsync", new { id = course.Id }, course);
-            return Ok(mapper.Map<CourseDto>(course));
-        }
-        // DELETE: api/Courses/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCourse(int id)
-        {
-            if (_context.Course == null)
-            {
-                return NotFound();
-            }
-            var course = await _context.Course.FindAsync(id);
-            if (course == null)
-            {
-                return NotFound();
-            }
-
-            _context.Course.Remove(course);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
+       
+        
 
         private bool CourseExists(int id)
         {
             return (_context.Course?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+
+        //[HttpPost]
+        //public async Task<ActionResult<Course>> AddAcync(Course course)
+        //{
+        //  if (_context.Course == null)
+        //  {
+        //      return Problem("Entity set 'LmsApiContext.Course'  is null.");
+        //  }
+        //    _context.Course.Add(course);
+        //    await _context.SaveChangesAsync();
+
+        //    return CreatedAtAction("GetCourse", new { id = course.Id }, course);
+        //}
+
+
+        // [HttpGet] ////GET: api/Courses
+        // public async Task<ActionResult<IEnumerable<Course>>> GetAllCourses()
+        // {
+        //  var courses = await uow.CourseRepository.GetAllCourses();
+        //     return Ok(courses);
+        // }
     }
 }

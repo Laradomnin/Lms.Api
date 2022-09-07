@@ -15,6 +15,7 @@ namespace Lms.Core.Entities
             StartDate = startDate;
         }
 
+ 
         public int Id { get; set; }
         public string Title { get; set; }
         public DateTime StartDate { get; set; }

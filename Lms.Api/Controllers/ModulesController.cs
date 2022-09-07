@@ -55,22 +55,22 @@ namespace Lms.Api.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<ActionResult<ModuleDto>> Create(int id, ModuleDto dto)
-        {
-            var course = await uow.CourseRepository.GetCourse(id);
-            if (course is null)
-                return NotFound(new { Error = new[] { $"CodeEvent with id: [{id}] not found" } });
+        //[HttpPost]
+        //public async Task<ActionResult<ModuleDto>> Create(int id, ModuleDto dto)
+        //{
+        //    var course = await uow.CourseRepository.GetCourse(id);
+        //    if (course is null)
+        //        return NotFound(new { Error = new[] { $"CodeEvent with id: [{id}] not found" } });
 
-            var module = mapper.Map<Module>(dto);
-            module.Course = course;
-            await uow.ModuleRepository.Add(module);
+        //    var module = mapper.Map<Module>(dto);
+        //    module.Course = course;
+        //    await uow.ModuleRepository.Add(module);
 
-            await uow.CompleteAsync();
-            var model = mapper.Map<ModuleDto>(module);
-            return CreatedAtAction(nameof(GetCourse), new { name = course.Title, id = model.Id }, model);
+        //    await uow.CompleteAsync();
+        //    var model = mapper.Map<ModuleDto>(module);
+        //    return CreatedAtAction(nameof(GetCourse), new { name = course.Title, id = model.Id }, model);
 
-        }
+        //}
 
 
         // DELETE: api/Modules/5

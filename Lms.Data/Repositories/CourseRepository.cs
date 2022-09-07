@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 
 namespace Lms.Data.Repositories
 {
+  
+
     public class CourseRepository : ICourseRepository
     {
         private readonly LmsApiContext db;
@@ -41,12 +43,16 @@ namespace Lms.Data.Repositories
         {
             return await db.Course.FirstOrDefaultAsync(c => c.Title == title);
         }
-
-    
-
-        public Task<Course> FindAsync(int? id)
+        public async Task<Course?> GetCourse(int? id)
         {
-            throw new NotImplementedException();
+            return await db.Course.FirstOrDefaultAsync(c => c.Id == id);
+        }
+
+
+
+        public async Task<Course?> FindAsync(int id)
+        {
+           return await db.Course.FindAsync(id);
         }
 
         public void Update(Course course)
