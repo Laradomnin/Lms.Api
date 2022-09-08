@@ -44,7 +44,7 @@ namespace Lms.Data.Repositories
             return await db.Course.FirstOrDefaultAsync(c => c.Title == title);
             
         }
-        public async Task<Course?> GetCourse(int id)
+        public async Task<Course?> GetCourse(int id)// inkludera modules
         {
 
             return await db.Course.FirstOrDefaultAsync(c => c.Id == id);

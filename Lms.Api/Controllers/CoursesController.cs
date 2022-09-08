@@ -40,8 +40,8 @@ namespace Lms.Api.Controllers
         }
 
 
-        [HttpGet("{id}")] // dto
-        public async Task<ActionResult<Course>> GetCourse(int id)
+        [HttpGet("{id}")] // dto //api/courses/2?includeModules=true
+        public async Task<ActionResult<Course>> GetCourse(int id, bool includeModules)
         {
           if (_context.Course == null)
           {
