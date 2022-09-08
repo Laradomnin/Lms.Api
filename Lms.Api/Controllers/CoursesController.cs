@@ -105,11 +105,11 @@ namespace Lms.Api.Controllers
             return NoContent();
         }
         [HttpPatch("{Id}")]
-        public async Task<ActionResult<CourseDto>> PatchEvent(int id, JsonPatchDocument <CourseDto> patchDocument)
+        public async Task<ActionResult<CourseDto>> PatchCourse(int id, JsonPatchDocument <CourseDto> patchDocument)
         {
-            var course = await uow.CourseRepository.FindAsync(id);   //GetCourse??
+            var course = await uow.CourseRepository.GetCourse(id);   //FindAsync? 
 
-            if (course is null) return NotFound();
+            if (course == null) return NotFound();
 
             var dto = mapper.Map<CourseDto>(course);
 
@@ -124,10 +124,10 @@ namespace Lms.Api.Controllers
             return Ok(mapper.Map<CourseDto>(course));
         }
 
-         private bool CourseExists(int id)
-        {
-            return (_context.Course?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        // private bool CourseExists(int id)
+        //{
+        //    return (_context.Course?.Any(e => e.Id == id)).GetValueOrDefault();
+        //}
 
         //[HttpPut("{id}")]
         //public async Task<IActionResult> PutCourse(int id, Course course)
