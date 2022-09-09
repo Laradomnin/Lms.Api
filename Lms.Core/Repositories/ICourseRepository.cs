@@ -18,5 +18,6 @@ namespace Lms.Core.Repositories
         void Update(Course course);
         void Remove(Course course);
         Task <Course> GetCourse(string title);
+        Task<IEnumerable<Course>> GetAsync(bool includeModules);
     }
 }

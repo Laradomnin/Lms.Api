@@ -26,22 +26,29 @@ namespace Lms.Api.Controllers
         {
             _context = context;
             this.mapper = mapper;
-            //  uow = new UnitOfWork(_context);
             uow = unitOfWork;
         }
- 
 
-        [HttpGet] //GET: api/Courses dto 
-        public async Task<ActionResult<IEnumerable<Course>>> GetAllCourses()
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesModules(bool includeModules)
         {
-            var courses = await uow.CourseRepository.GetAllCourses();
-            var dto = mapper.Map<IEnumerable<CourseDto>>(courses);
+            var course = await uow.CourseRepository.GetAsync(includeModules);
+            var dto = mapper.Map<IEnumerable<CourseDto>>(course);
             return Ok(dto);
         }
 
+        //[HttpGet] //GET: api/Courses dto 
+        //public async Task<ActionResult<IEnumerable<Course>>> GetAllCourses()
+        //{
+        //    var courses = await uow.CourseRepository.GetAllCourses();
+        //    var dto = mapper.Map<IEnumerable<CourseDto>>(courses);
+        //    return Ok(dto);
+        //}
 
-        [HttpGet("{id}")] // dto //api/courses/2?includeModules=true
-        public async Task<ActionResult<Course>> GetCourse(int id, bool includeModules)
+
+        [HttpGet("{id}")] // dto //api/courses/2?includeModules=true , bool includeModules =false)
+        public async Task<ActionResult<Course>> GetCourse(int id)
         {
           if (_context.Course == null)
           {
@@ -124,60 +131,10 @@ namespace Lms.Api.Controllers
             return Ok(mapper.Map<CourseDto>(course));
         }
 
-        // private bool CourseExists(int id)
-        //{
-        //    return (_context.Course?.Any(e => e.Id == id)).GetValueOrDefault();
-        //}
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutCourse(int id, Course course)
-        //{
-        //    if (id != course.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.Entry(course).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!CourseExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
+        
 
 
-        //[HttpPost]
-        //public async Task<ActionResult<Course>> AddAcync(Course course)
-        //{
-        //  if (_context.Course == null)
-        //  {
-        //      return Problem("Entity set 'LmsApiContext.Course'  is null.");
-        //  }
-        //    _context.Course.Add(course);
-        //    await _context.SaveChangesAsync();
 
-        //    return CreatedAtAction("GetCourse", new { id = course.Id }, course);
-        //}
-
-
-        // [HttpGet] ////GET: api/Courses
-        // public async Task<ActionResult<IEnumerable<Course>>> GetAllCourses()
-        // {
-        //  var courses = await uow.CourseRepository.GetAllCourses();
-        //     return Ok(courses);
-        // }
     }
 }

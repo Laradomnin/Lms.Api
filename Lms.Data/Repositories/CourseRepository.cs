@@ -63,5 +63,17 @@ namespace Lms.Data.Repositories
         {
             throw new NotImplementedException();
         }
+
+        public async Task<IEnumerable<Course>> GetAsync(bool includeModules = false)
+        {
+            return includeModules ? await db.Course
+                            .Include(c => c.Title)
+                            .Include(c => c.Modules)
+                            .ToListAsync() :
+                            await db.Course
+                            .Include(c => c.Title)
+                            .Include(c => c.StartDate)
+                            .ToListAsync();
+        }
     }
 }

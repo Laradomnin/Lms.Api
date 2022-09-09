@@ -9,6 +9,7 @@ namespace Lms.Core.Repositories
 {
     public interface IModuleRepository
     {
+        //internal async Task<IEnumerable<Course>> GetAsync(bool includeModules = false)
         Task<IEnumerable<Module>> GetAllModules();
         Task<Module> GetModule(int? id);
         Task<Module> FindAsync(int? id);
